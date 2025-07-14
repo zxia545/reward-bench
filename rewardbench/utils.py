@@ -122,9 +122,9 @@ def save_to_hub(
 
     if save_metrics_for_beaker:
         # ai2 internal visualization, not needed externally, global path intentional.
-        dirname = os.path.dirname("/output/metrics.json")
+        dirname = os.path.dirname("./output/metrics.json")
         os.makedirs(dirname, exist_ok=True)  # redundant in Beaker code
-        with open("/output/metrics.json", "w+") as f:  # save format for AI2 beaker to show results
+        with open("./output/metrics.json", "w+") as f:  # save format for AI2 beaker to show results
             json.dump(results_dict, f)
 
     dirname = os.path.dirname(scores_path)
