@@ -22,6 +22,7 @@ from transformers import (
     MixtralForCausalLM,
     T5ForConditionalGeneration,
     Qwen2_5_VLForConditionalGeneration,
+    GemmaForSequenceClassification,
 )
 
 from .armorm import ArmoRMPipeline
@@ -34,7 +35,7 @@ from .ldlreward import LDLPipeline, LDLRewardModel27B
 from .openassistant import *  # noqa
 from .openbmb import LlamaRewardModel, OpenBMBPipeline
 from .pairrm import DebertaV2PairRM, PairRMPipeline
-from .pipeline import RewardBenchPipeline
+from .pipeline import RewardBenchPipeline, HFSequenceClassificationPipeline
 from .qrm import LlamaForRewardModelWithGating3, LlamaForRewardModelWithGating31
 from .shp import SHPPipeline
 from .slicpairpm import SlicPairPMPipeline
@@ -265,6 +266,13 @@ REWARD_MODEL_CONFIG = {
         "custom_dialogue": False,
         "model_type": "Seq. Classifier",
         "torch_dtype": torch.bfloat16,
+    },
+    "weqweasdas/RM-Gemma-7B": {
+        "model_builder": AutoModel.from_pretrained,
+        "pipeline_builder": HFSequenceClassificationPipeline,
+        "quantized": False,
+        "custom_dialogue": False,
+        "model_type": "Seq. Classifier",
     },
 }
 

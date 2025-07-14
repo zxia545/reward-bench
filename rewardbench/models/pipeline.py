@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import torch
+from transformers import pipeline
 
 
 # should be redundant, but having determinism issues
@@ -79,3 +80,19 @@ class RewardBenchPipeline:
             return outputs.logits, inputs
         else:
             return outputs.logits
+
+
+def HFSequenceClassificationPipeline(model, tokenizer, device=0, **kwargs):
+    pipe = pipeline(
+        "sentiment-analysis",
+        model=model,
+        tokenizer=tokenizer,
+        device=device,
+        **kwargs
+    )
+    def wrapped_pipe(inputs, *args, **pipe_kwargs):
+        outputs = pipe(inputs, *args, **pipe_kwargs)
+        # outputs: list of list of dicts (batch, labels)
+        # flatten to list of dicts (take first label for each sample)
+        return [output[0] if isinstance(output, list) and len(output) > 0 else output for output in outputs]
+    return wrapped_pipe

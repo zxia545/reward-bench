@@ -55,6 +55,7 @@ def get_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, required=True, help="path to model")
+    parser.add_argument("--model_name", type=str, required=True, help="name of model")
     parser.add_argument("--tokenizer", type=str, default=None, help="path to non-matching tokenizer to model")
     parser.add_argument("--chat_template", type=str, default="tulu", help="path to chat template")
     parser.add_argument(
@@ -122,8 +123,8 @@ def main():
     chat_template = args.chat_template
     conv = get_conv_template(chat_template)
 
-    if args.model in REWARD_MODEL_CONFIG:
-        config = REWARD_MODEL_CONFIG[args.model]
+    if args.model_name in REWARD_MODEL_CONFIG:
+        config = REWARD_MODEL_CONFIG[args.model_name]
     else:
         config = REWARD_MODEL_CONFIG["default"]
     logger.info(f"Using reward model config: {config}")
@@ -346,7 +347,7 @@ def main():
 
     # get core dataset
     results_grouped = {}
-    results_grouped["model"] = args.model
+    results_grouped["model"] = args.model_name
     results_grouped["model_type"] = model_type
     results_grouped["chat_template"] = (
         args.chat_template if not check_tokenizer_chat_template(tokenizer) else "tokenizer"
@@ -372,7 +373,7 @@ def main():
     sub_path = "eval-set/" if not args.pref_sets else "pref-sets/"
     results_url = save_to_hub(
         results_grouped,
-        args.model,
+        args.model_name,
         sub_path,
         args.debug,
         local_only=args.do_not_save,
@@ -380,18 +381,26 @@ def main():
     )
     if not args.do_not_save:
         logger.info(f"Uploaded reward model results to {results_url}")
+        
+    scores_dict = out_dataset.to_dict()
+    scores_dict["model"] = args.model_name
+    scores_dict["model_type"] = model_type
+
+    sub_path_scores = "eval-set-scores/" if not args.pref_sets else "pref-sets-scores/"
+
+    scores_url = save_to_hub(scores_dict, args.model_name, sub_path_scores, args.debug, local_only=args.do_not_save)
 
     # upload chosen-rejected with scores
     if not model_type == "Custom Classifier":  # custom classifiers do not return scores
         # create new json with scores and upload
         scores_dict = out_dataset.to_dict()
-        scores_dict["model"] = args.model
+        scores_dict["model"] = args.model_name
         scores_dict["model_type"] = model_type
         scores_dict["chat_template"] = args.chat_template
 
         sub_path_scores = "eval-set-scores/" if not args.pref_sets else "pref-sets-scores/"
 
-        scores_url = save_to_hub(scores_dict, args.model, sub_path_scores, args.debug, local_only=args.do_not_save)
+        scores_url = save_to_hub(scores_dict, args.model_name, sub_path_scores, args.debug, local_only=args.do_not_save)
         logger.info(f"Uploading chosen-rejected text with scores to {scores_url}")
     else:
         logger.info("Not uploading chosen-rejected text with scores due to model compatibility")
