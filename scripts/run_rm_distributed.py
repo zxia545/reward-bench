@@ -112,7 +112,7 @@ REWARD_MODEL_CONFIGS = {
         "model_type": "pipeline",
         "pipeline_task": "sentiment-analysis",
         "pipeline_kwargs": {
-            "return_all_scores": True,
+            "top_k": None,
             "function_to_apply": "none",
             "batch_size": 1
         },
@@ -202,7 +202,7 @@ class ScriptArguments:
         metadata={"help": "PyTorch dtype (float16, bfloat16, float32)"},
     )
     attn_implementation: Optional[str] = field(
-        default="flash_attention_2",
+        default=None,
         metadata={"help": "Attention implementation (eager, sdpa, flash_attention_2)"},
     )
     trust_remote_code: bool = field(
@@ -231,6 +231,7 @@ class RMPipeline:
         max_length=4096,
         trust_remote_code=False,
     ):
+        attn_implementation = None
         if device_map is None:
             device_map = {"": accelerator.process_index}
             
