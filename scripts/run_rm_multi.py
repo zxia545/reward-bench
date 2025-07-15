@@ -310,10 +310,9 @@ def main():
     scores_chosen_gathered = accelerator.gather_for_metrics(scores_chosen)
     scores_rejected_gathered = accelerator.gather_for_metrics(scores_rejected)
     if accelerator.is_main_process:
-        # Flatten the gathered results (list of lists) into a single list
-        flat_results = [item for sublist in results_gathered for item in sublist]
-        flat_scores_chosen = [item for sublist in scores_chosen_gathered for item in sublist]
-        flat_scores_rejected = [item for sublist in scores_rejected_gathered for item in sublist]
+        flat_results = list(results_gathered)
+        flat_scores_chosen = list(scores_chosen_gathered)
+        flat_scores_rejected = list(scores_rejected_gathered)
         out_dataset = dataset.add_column("results", flat_results)
 
         # add subsets back (removed so it's not handled by cuda)
