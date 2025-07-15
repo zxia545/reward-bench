@@ -533,6 +533,10 @@ def main():
         
         # Also save as JSON format for easier access (only 4 key fields)
         json_output_path = script_args.output_path.rstrip('/') + '.json'
+        # json file name should be the model name
+        json_output_path = f"{script_args.output_path}/{model_name}.json"
+        
+        
         full_dict = ds.to_dict()
         
         # Only keep the 4 required fields that can be mapped one-to-one
