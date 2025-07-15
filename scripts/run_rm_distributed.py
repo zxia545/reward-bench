@@ -537,6 +537,8 @@ def main():
         
         # Only keep the 4 required fields that can be mapped one-to-one
         scores_dict = {
+            "model": model_name,
+            "id": full_dict["id"],
             "text_chosen": full_dict["text_chosen"],
             "text_rejected": full_dict["text_rejected"],
             "chosen_reward": full_dict["chosen_reward"],
