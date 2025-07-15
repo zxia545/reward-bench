@@ -306,7 +306,7 @@ def main():
                 scores_chosen.extend(score_chosen_batch)
                 scores_rejected.extend(score_rejected_batch)
 
-    results_gathered = all_gather(results)
+    results_gathered = accelerator.gather_for_metrics(results)
     if accelerator.is_main_process:
         ############################
         # Print & process results
