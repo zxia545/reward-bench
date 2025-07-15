@@ -307,20 +307,22 @@ def main():
                 scores_rejected.extend(score_rejected_batch)
 
     results_gathered = accelerator.gather_for_metrics(results)
+    scores_chosen_gathered = accelerator.gather_for_metrics(scores_chosen)
+    scores_rejected_gathered = accelerator.gather_for_metrics(scores_rejected)
     if accelerator.is_main_process:
-        ############################
-        # Print & process results
-        ############################
-        # add column for results for easy printing
-        out_dataset = dataset.add_column("results", results_gathered)
+        # Flatten the gathered results (list of lists) into a single list
+        flat_results = [item for sublist in results_gathered for item in sublist]
+        flat_scores_chosen = [item for sublist in scores_chosen_gathered for item in sublist]
+        flat_scores_rejected = [item for sublist in scores_rejected_gathered for item in sublist]
+        out_dataset = dataset.add_column("results", flat_results)
 
         # add subsets back (removed so it's not handled by cuda)
         out_dataset = out_dataset.add_column("subset", subsets)
         out_dataset = out_dataset.add_column("id", ids)
 
         # add scores_chosen and scores_rejected to the dataset
-        out_dataset = out_dataset.add_column("scores_chosen", scores_chosen)
-        out_dataset = out_dataset.add_column("scores_rejected", scores_rejected)
+        out_dataset = out_dataset.add_column("scores_chosen", flat_scores_chosen)
+        out_dataset = out_dataset.add_column("scores_rejected", flat_scores_rejected)
 
         # get core dataset
         results_grouped = {}
