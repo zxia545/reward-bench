@@ -8,6 +8,7 @@ import argparse
 import logging
 import os
 import sys
+import json
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -529,6 +530,22 @@ def main():
         # Save to disk
         ds.save_to_disk(script_args.output_path)
         logger.info(f"Results saved to {script_args.output_path}")
+        
+        # Also save as JSON format for easier access (only 4 key fields)
+        json_output_path = script_args.output_path.rstrip('/') + '.json'
+        full_dict = ds.to_dict()
+        
+        # Only keep the 4 required fields that can be mapped one-to-one
+        scores_dict = {
+            "text_chosen": full_dict["text_chosen"],
+            "text_rejected": full_dict["text_rejected"],
+            "chosen_reward": full_dict["chosen_reward"],
+            "rejected_reward": full_dict["rejected_reward"]
+        }
+        
+        with open(json_output_path, "w") as f:
+            json.dump(scores_dict, f, indent=4, sort_keys=True)
+        logger.info(f"Results also saved as JSON to {json_output_path}")
         
         # Print some statistics
         logger.info(f"Processed {len(all_rewards)} samples")
