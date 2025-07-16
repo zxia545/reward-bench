@@ -534,8 +534,11 @@ def main():
         # Also save as JSON format for easier access (only 4 key fields)
         json_output_path = script_args.output_path.rstrip('/') + '.json'
         # json file name should be the model name
+        model_name = model_name.replace("/", "_")
         json_output_path = f"{script_args.output_path}/{model_name}.json"
         
+        # make the directory if it doesn't exist
+        os.makedirs(os.path.dirname(json_output_path), exist_ok=True)
         
         full_dict = ds.to_dict()
         
