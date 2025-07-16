@@ -40,7 +40,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Optional
 
-import accelerate
+# import accelerate
 import torch
 from datasets import load_from_disk
 from tqdm import tqdm
@@ -192,11 +192,11 @@ REWARD_MODEL_CONFIGS = {
 
 # Setup accelerator with minimal configuration for model parallelism
 # We don't need data parallelism, just model parallelism
-accelerator = accelerate.Accelerator(
-    split_batches=False,
-    dispatch_batches=False,
-    device_placement=False,  # We'll handle device placement manually
-)
+# accelerator = accelerate.Accelerator(
+#     split_batches=False,
+#     # dispatch_batches=False,
+#     device_placement=False,  # We'll handle device placement manually
+# )
 
 # get token from HF_TOKEN env variable, but if it doesn't exist pass none
 HF_TOKEN = os.getenv("HF_TOKEN", None)
@@ -494,13 +494,13 @@ def main():
     # Setup logging
     logger = setup_logging()
     
-    # Check if user is trying to use accelerate launch (not recommended for model parallelism)
-    if accelerator.num_processes > 1:
-        logger.warning(
-            "WARNING: This script is designed for MODEL PARALLELISM, not DATA PARALLELISM. "
-            "You should run it with 'python' directly, not 'accelerate launch'. "
-            "The model will be distributed across multiple GPUs automatically using device_map."
-        )
+    # # Check if user is trying to use accelerate launch (not recommended for model parallelism)
+    # if accelerator.num_processes > 1:
+    #     logger.warning(
+    #         "WARNING: This script is designed for MODEL PARALLELISM, not DATA PARALLELISM. "
+    #         "You should run it with 'python' directly, not 'accelerate launch'. "
+    #         "The model will be distributed across multiple GPUs automatically using device_map."
+    #     )
     
     # Convert torch_dtype string to torch dtype
     torch_dtype = torch_dtype_mapping(script_args.torch_dtype)
